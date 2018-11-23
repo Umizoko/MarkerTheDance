@@ -17,3 +17,8 @@ Networkにつながっている必要がある
 デスクトップ /　モバイル対応
 
 １週間ほど
+
+// threeでの直接的実装
+https://qiita.com/mkoku/items/48b39e2750bceb72fbf6
+
+https://github.com/jeromeetienne/AR.js/blob/master/three.js/examples/basic.html
