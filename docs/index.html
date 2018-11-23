@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>aframe-ar Dance Demo</title>
+    <title>MarkerTheDance</title>
     <!-- bundle -->
     <script src="bundle.js"></script>
 </head>
@@ -12,17 +12,29 @@
 <body style="margin:0px; overflow:hidden;">
     <!-- A-Frame ライブラリの読み込み -->
     <script src="/js/aframe.min.js"></script>
+    <!-- A-Frame Helperの読み込み -->
+    <script src="/js/aframe-extras.min.js"></script>
     <!-- AR.js ライブラリの読み込み -->
     <script src="/js/aframe-ar.min.js"></script>
 
     <!-- A-Frame の VR空間に AR.js を紐づける（デバッグUIは非表示） -->
-    <a-scene embedded arjs="debugUIEnabled:false;">
+    <a-scene embedded arjs="debugUIEnabled:false;" stats>
+
+        <!-- assets -->
+        <a-assets>
+            <a-asset-item id="model" src='/assets/voxel/umizoko.gltf'>
+        </a-assets>
 
         <!-- マーカーを登録（プリセットされている「hiro」マーカー） -->
         <a-marker preset="hiro">
-            <!-- マーカーの場所に箱を置く（見やすいようにワイヤーフレーム表示） -->
-            <a-box position="0 0.5 0" wireframe="true"></a-box>
+
+            <!-- Animation Mixer ComponentでAnimationを制御する -->
+            <a-gltf-model src="#model" animation-mixer="clip: *"></a-gltf-model>
+
         </a-marker>
+
+
+
 
         <!-- AR用のカメラを置く -->
         <a-entity camera></a-entity>
