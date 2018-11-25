@@ -1,46 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>MarkerTheDance</title>
-    <!-- A-Frame ライブラリの読み込み -->
-    <script src="js/aframe.min.js"></script>
-    <!-- A-Frame Helperの読み込み -->
-    <script src="js/aframe-extras.min.js"></script>
-    <!-- AR.js ライブラリの読み込み -->
-    <script src="js/aframe-ar.min.js"></script>
-    <!-- bundle -->
-    <!-- <script src="bundle.js"></script> -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <script src="js/three.min.js"></script>
+    <script src="js/ar.min.js"></script>
+    <script src="./bundle.js"></script>
 </head>
 
-<body style="margin:0px; overflow:hidden;">
+<body>
 
-
-    <!-- A-Frame の VR空間に AR.js を紐づける（デバッグUIは非表示） -->
-    <a-scene embedded arjs="debugUIEnabled:false;" stats>
-
-        <!-- assets -->
-        <a-assets>
-            <a-asset-item id="model" src='assets/voxel/umizoko.gltf'>
-        </a-assets>
-
-        <!-- マーカーを登録（プリセットされている「hiro」マーカー） -->
-        <a-marker preset="hiro">
-
-            <!-- Animation Mixer ComponentでAnimationを制御する -->
-            <a-gltf-model src="#model" animation-mixer="clip: *"></a-gltf-model>
-
-        </a-marker>
-
-
-
-
-        <!-- AR用のカメラを置く -->
-        <a-entity camera></a-entity>
-
-    </a-scene>
+    <canvas id="threeCanvas"></canvas>
 </body>
 
 </html>
