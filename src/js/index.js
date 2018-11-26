@@ -1,3 +1,5 @@
+import Stat from './module/stats'
+
 window.addEventListener( "load", init );
 
 function init () {
@@ -10,11 +12,8 @@ function init () {
 
     renderer.setClearColor( new THREE.Color( "black" ), 0 ); // レンダラの背景色
     renderer.setSize( 640, 480 ); // レンダラのサイズ
+    renderer.gammaOutput = true;
 
-    // renderer.domElement.style.position = "absolute"; // レンダラの位置は絶対値
-    // renderer.domElement.style.top = "0px"; // レンダラの上端
-    // renderer.domElement.style.left = "0px"; // レンダラの左端
-    // document.body.appendChild( renderer.domElement ); // レンダラの DOM を body に入れる
 
     var camera = new THREE.Camera(); // カメラの作成
     scene.add( camera ); // カメラをシーンに追加
@@ -71,6 +70,7 @@ function init () {
         patternUrl: "ar/hiro.patt", // マーカファイル
     } );
     scene.add( marker1 ); // マーカをシーンに追加
+
     // モデル（メッシュ）
     var geo = new THREE.CubeGeometry( 1, 1, 1 ); // cube ジオメトリ（サイズは 1x1x1）
     var mat = new THREE.MeshNormalMaterial( { // マテリアルの作成
@@ -82,6 +82,34 @@ function init () {
     mesh1.name = "cube"; // メッシュの名前（後でピッキングで使う）
     mesh1.position.set( 0, 0.5, 0 ); // 初期位置
     marker1.add( mesh1 ); // メッシュをマーカに追加
+
+
+    let mixier;
+    let loader = new THREE.GLTFLoader();
+
+    loader.load(
+        './assets/voxel/umizoko.gltf',
+        ( gltf ) => {
+
+            // modelをgroupに追加
+            marker1.add( gltf.scene );
+
+            // animaiton再生
+            const animations = gltf.animations;
+            console.log( animations );
+            console.log( gltf.scene );
+            if ( animations && animations.length ) {
+                let i;
+                mixier = new THREE.AnimationMixer( gltf.scene );
+                for ( i = 0; i < animations.length; i++ ) mixier.clipAction( animations[ i ] ).play();
+            }
+
+        },
+        ( xhr ) => ( console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' ) ),
+        ( error ) => ( console.log( 'An error happened ', error ) )
+    );
+
+
     // マーカ隠蔽（cloaking）
     // var videoTex = new THREE.VideoTexture( source.domElement ); // 映像をテクスチャとして取得
     // videoTex.minFilter = THREE.NearestFilter; // 映像テクスチャのフィルタ処理
@@ -89,12 +117,28 @@ function init () {
     // cloak.object3d.material.uniforms.opacity.value = 1.0; // cloakの不透明度
     // marker1.add( cloak.object3d ); // cloakをマーカに追加
 
+    // performance
+    const stats = new Stat();
+    document.body.appendChild( stats.dom );
+
+    const clock = new THREE.Clock();
 
     // render
     function render () {
+
+        // obs performance
+        stats.update();
+
         requestAnimationFrame( render );
+
         if ( source.ready === false ) return;
+
+        // ar
         context.update( source.domElement );
+
+        // animation
+        if ( mixier ) mixier.update( clock.getDelta() );
+
         renderer.render( scene, camera );
     }
 

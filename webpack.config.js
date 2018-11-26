@@ -17,8 +17,6 @@ module.exports = {
         // port: '80'
     },
 
-    // html: './docs/index.html',
-
     // mainとなるJavaScriptファイル（エントリーポイント）
     entry: `./src/js/index.js`,
 
