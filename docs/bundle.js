@@ -114,7 +114,6 @@ function init () {
     } );
 
     renderer.setClearColor( new THREE.Color( "black" ), 0 );
-    // renderer.setSize( 640, 480 );
     const myCanvas = document.querySelector( '#threeCanvas' );
     let canvasWidth = myCanvas.clientWidth;
     let canvasHeight = myCanvas.clientHeight;
@@ -152,11 +151,7 @@ function init () {
         maxDetectionRate: 30,
         canvasWidth: source.parameters.sourceWidth,
         canvasHeight: source.parameters.sourceHeight,
-        // canvasWidth: canvasWidth,
-        // canvasHeight: canvasHeight
     } );
-
-    console.log( source.parameters );
 
     context.init( function onCompleted () {
 
@@ -200,19 +195,6 @@ function init () {
         marker,
         option
     );
-
-
-    // モデル（メッシュ）
-    // var geo = new THREE.CubeGeometry( 1, 1, 1 ); // cube ジオメトリ（サイズは 1x1x1）
-    // var mat = new THREE.MeshNormalMaterial( { // マテリアルの作成
-    //     transparent: true, // 透過
-    //     opacity: 0.5, // 不透明度
-    //     side: THREE.DoubleSide, // 内側も描く
-    // } );
-    // var mesh1 = new THREE.Mesh( geo, mat ); // メッシュを生成
-    // mesh1.name = "cube"; // メッシュの名前（後でピッキングで使う）
-    // mesh1.position.set( 0, 0.5, 0 ); // 初期位置
-    // marker.add( mesh1 ); // メッシュをマーカに追加
 
 
     // animation

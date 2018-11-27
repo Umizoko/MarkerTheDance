@@ -1,4 +1,6 @@
-・音楽込みで再生
+・Sound実装
+
+・Dance有りのModelに書き換える
 
 // videoが大きなサイズでDOM生成されている。
 ・mobile / desktop でのスタイル作成
