@@ -1,13 +1,8 @@
-How to MARKER
-https://qiita.com/mkoku/items/c635566e829c303a7d3f
+・音楽込みで再生
 
-AR.js
-http://localhost:8080/
+// videoが大きなサイズでDOM生成されている。
+・mobile / desktop でのスタイル作成
 
-// threeでの直接的実装
-https://qiita.com/mkoku/items/48b39e2750bceb72fbf6
+・TypeScript
 
-https://github.com/jeromeetienne/AR.js/blob/master/three.js/examples/basic.html
-
-// gltf animaiton
-https://ryo620.org/2018/02/threejs-animation/
+・クラスでmoduleにする
