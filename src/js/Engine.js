@@ -175,7 +175,7 @@ export default class Engine {
         );
 
         // audio
-        const audioElement = document.createElement( 'audio' );
+        const audioElement = new Audio();
         audioElement.setAttribute( 'src', './assets/sound/Go_to_the_camp.mp3' );
         document.body.appendChild( audioElement );
         audioElement.loop = true;
