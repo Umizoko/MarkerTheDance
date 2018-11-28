@@ -1,14 +1,8 @@
 ・Sound実装
 
-・Dance有りのModelに書き換える
+・影を実装
 
-// videoが大きなサイズでDOM生成されている。
-・mobile / desktop でのスタイル作成
-
-・TypeScript
-
-・クラスでmoduleにする
-
+・演出としてParticle実装
 
 ・Sound
 https://dova-s.jp/bgm/play9834.html
