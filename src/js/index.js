@@ -12,6 +12,7 @@ function init () {
     // create renderer
     const renderer = new THREE.WebGLRenderer( {
         canvas: document.querySelector( "#threeCanvas" ),
+        antialias: true,
         alpha: true,
     } );
 
@@ -101,31 +102,49 @@ function init () {
 
     // animation
     let mixier;
-    // gltf loader
-    let loader = new THREE.GLTFLoader();
+    // // gltf loader
+    // let loader = new THREE.GLTFLoader();
 
-    // model load
+    // // model load
+    // loader.load(
+    //     './assets/voxel/umizoko.gltf',
+    //     ( gltf ) => {
+
+
+    //         // animaiton再生
+    //         const animations = gltf.animations;
+    //         const object = gltf.scene;
+    //         if ( animations && animations.length ) {
+    //             let i;
+    //             mixier = new THREE.AnimationMixer( object );
+    //             for ( i = 0; i < animations.length; i++ ) mixier.clipAction( animations[ i ] ).play();
+    //         }
+
+    //         // modelをgroupに追加
+    //         marker.add( object );
+
+    //     },
+    //     ( xhr ) => ( console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' ) ),
+    //     ( error ) => ( console.log( 'An error happened ', error ) )
+    // );
+
+    let loader = new THREE.FBXLoader();
     loader.load(
-        './assets/voxel/umizoko.gltf',
-        ( gltf ) => {
+        './assets/robot/WaveHipHopDance.fbx',
+        ( object ) => {
 
+            object.mixier = new THREE.AnimationMixer( object );
+            mixier = object.mixier;
 
-            // animaiton再生
-            const animations = gltf.animations;
-            const object = gltf.scene;
-            if ( animations && animations.length ) {
-                let i;
-                mixier = new THREE.AnimationMixer( object );
-                for ( i = 0; i < animations.length; i++ ) mixier.clipAction( animations[ i ] ).play();
-            }
+            const action = object.mixier.clipAction( object.animations[ 0 ] );
+            action.play();
 
-            // modelをgroupに追加
+            // scaling
+            object.scale.set( 0.01, 0.01, 0.01 );
+
             marker.add( object );
-
-        },
-        ( xhr ) => ( console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' ) ),
-        ( error ) => ( console.log( 'An error happened ', error ) )
-    );
+        }
+    )
 
 
     // performance
