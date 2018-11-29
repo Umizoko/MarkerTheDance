@@ -1,6 +1,6 @@
-・Sound実装
-
-・影を実装
+・Web Audio APIの実装
+機能フェードイン、フェードアウト、自動再生
+URL: https://www.html5rocks.com/ja/tutorials/webaudio/intro/
 
 ・演出としてParticle実装
 

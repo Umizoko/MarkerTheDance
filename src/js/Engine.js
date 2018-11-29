@@ -1,4 +1,6 @@
 import Stat from './module/stats'
+import FBXModel from './module/FBXModel'
+import GLTFModel from './module/GLTFModel'
 
 export default class Engine {
 
@@ -33,27 +35,13 @@ export default class Engine {
         let canvasHeight = myCanvas.clientHeight;
         renderer.setSize( canvasWidth, canvasHeight );
         renderer.gammaOutput = true;
-
+        renderer.gammaInput = true;
+        renderer.shadowMap.enabled = true;
 
         // create camera
         const camera = new THREE.Camera();
         scene.add( camera );
 
-
-        // create light
-        const light = new THREE.DirectionalLight( 0xffffff );
-        light.position.set( 0, 0, 2 );
-        scene.add( light );
-
-
-        // ARControllerClass
-        // param @ camera THREE.Camera
-        // param @ marker THREE.Group
-        // method
-
-        // init
-        // update
-        // resize
 
         // arToolkitSource
         const source = new THREEx.ArToolkitSource( {
@@ -100,86 +88,85 @@ export default class Engine {
             option
         );
 
-
-        // GLTFModelClass
-        // params @ filename String
-        // params @ scene THREE.Scene
-        // params @ group THREE.Group
-        // params @ mixier THREE.Mixier
-
-        // method
-        // init
-        // update
-        // animStart
-        // animation
-        // let mixier;
-        // // gltf loader
-        // let loader = new THREE.GLTFLoader();
-
-        // // model load
-        // loader.load(
-        //     './assets/voxel/umizoko.gltf',
-        //     ( gltf ) => {
+        // CubeMap(環境マップ)
+        const cubeTextureLoader = new THREE.CubeTextureLoader();
+        const env = './assets/env/Lycksele2/';
+        const textureCube = cubeTextureLoader.load( [
+            env + 'posx.jpg',
+            env + 'negx.jpg',
+            env + 'posy.jpg',
+            env + 'negy.jpg',
+            env + 'posz.jpg',
+            env + 'negz.jpg'
+        ] );
 
 
-        //         // animaiton再生
-        //         const animations = gltf.animations;
-        //         const object = gltf.scene;
-        //         if ( animations && animations.length ) {
-        //             let i;
-        //             mixier = new THREE.AnimationMixer( object );
-        //             for ( i = 0; i < animations.length; i++ ) mixier.clipAction( animations[ i ] ).play();
-        //         }
-
-        //         // modelをgroupに追加
-        //         marker.add( object );
-
-        //     },
-        //     ( xhr ) => ( console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' ) ),
-        //     ( error ) => ( console.log( 'An error happened ', error ) )
-        // );
-
-
-        // FBXModelClass
-        // params @ filename String
-        // params @ scene THREE.Scene
-        // params @ group THREE.Group
-        // params @ mixier THREE.Mixier
-
-        // method
-        // init
-        // update
-        // animStart
-
-        // manage animation frame 
-        const clock = new THREE.Clock();
-        // control key frame
-        let mixier;
-
-        let loader = new THREE.FBXLoader();
-        loader.load(
+        const robot = new FBXModel(
             './assets/robot/WaveHipHopDance.fbx',
-            ( object ) => {
-
-                object.mixier = new THREE.AnimationMixer( object );
-                mixier = object.mixier;
-
-                const action = object.mixier.clipAction( object.animations[ 0 ] );
-                action.play();
-
-                // scaling
-                object.scale.set( 0.01, 0.01, 0.01 );
-
-                marker.add( object );
-            }
+            scene,
+            marker,
+            textureCube
         );
 
-        // audio
-        const audioElement = new Audio();
-        audioElement.setAttribute( 'src', './assets/sound/Go_to_the_camp.mp3' );
-        document.body.appendChild( audioElement );
-        audioElement.loop = true;
-        audioElement.play();
+        robot.init();
+
+        // Web Audio API
+        // FIXME: 汎用クラスでの書き換え
+        let audioContext;
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioContext = new AudioContext();
+
+        let dogBarkingBuffer = null;
+
+        function loadDogSound ( url ) {
+
+            let request = new XMLHttpRequest();
+            request.open( 'GET', url, true );
+            request.responseType = 'arraybuffer';
+
+
+            request.onload = () => {
+                audioContext.decodeAudioData( request.response, ( buffer ) => {
+                    dogBarkingBuffer = buffer;
+                    playSound( dogBarkingBuffer );
+                } );
+            }
+
+            request.send();
+        }
+
+        function playSound ( buffer ) {
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect( audioContext.destination );
+            source.start( 0 );
+            source.loop = true;
+        }
+
+        loadDogSound( './assets/sound/Go_to_the_camp.mp3' );
+
+        // Directional Light
+        const directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
+        directionalLight.castShadow = true;
+        directionalLight.position.y = 4;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        scene.add( directionalLight );
+
+
+        // floor
+        const floor = new THREE.Mesh(
+            new THREE.BoxGeometry( 2, 0.1, 2 ),
+            new THREE.MeshStandardMaterial( {
+                color: 0xFFFFFF,
+                roughness: 0,
+                metalness: 1,
+                envMap: textureCube
+            } )
+        );
+        floor.position.y = -0.1
+        floor.receiveShadow = true;
+        marker.add( floor );
 
         tick();
 
@@ -196,8 +183,8 @@ export default class Engine {
             // ar
             context.update( source.domElement );
 
-            // animation
-            if ( mixier ) mixier.update( clock.getDelta() );
+            // robot update
+            robot.update();
 
             renderer.render( scene, camera );
 
