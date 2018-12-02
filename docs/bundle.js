@@ -99,6 +99,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _module_stats__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./module/stats */ "./src/js/module/stats.js");
 /* harmony import */ var _module_FBXModel__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./module/FBXModel */ "./src/js/module/FBXModel.js");
 /* harmony import */ var _module_GLTFModel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./module/GLTFModel */ "./src/js/module/GLTFModel.js");
+/* harmony import */ var _module_buffer_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./module/buffer-loader */ "./src/js/module/buffer-loader.js");
+/* harmony import */ var _module_SoundHelper__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./module/SoundHelper */ "./src/js/module/SoundHelper.js");
+
+
 
 
 
@@ -211,40 +215,43 @@ class Engine {
 
         robot.init();
 
-        // Web Audio API
-        // FIXME: 汎用クラスでの書き換え
-        let audioContext;
+
+        // Audioの設定
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioContext();
+        const audioContext = new AudioContext();
 
-        let dogBarkingBuffer = null;
+        // BGM登録
+        const bufferLoader = new _module_buffer_loader__WEBPACK_IMPORTED_MODULE_3__["default"](
+            audioContext,
+            [
+                './assets/sound/Go_to_the_camp.mp3'
+            ],
+            finishedLoading
+        );
 
-        function loadDogSound ( url ) {
+        // 音声データのロード
+        bufferLoader.load();
 
-            let request = new XMLHttpRequest();
-            request.open( 'GET', url, true );
-            request.responseType = 'arraybuffer';
+        // ロード後の処理
+        function finishedLoading ( bufferList ) {
+            // 1st sourceの指定
+            // 音声再生
+            // ループ再生 
 
+            const source1 = audioContext.createBufferSource();
+            source1.buffer = bufferList[ 0 ];
 
-            request.onload = () => {
-                audioContext.decodeAudioData( request.response, ( buffer ) => {
-                    dogBarkingBuffer = buffer;
-                    playSound( dogBarkingBuffer );
-                } );
-            }
-
-            request.send();
+            source1.connect( audioContext.destination );
+            Object(_module_SoundHelper__WEBPACK_IMPORTED_MODULE_4__["playerFadeinout"])( source1.buffer, audioContext );
+            // source1.start( 0 );
+            source1.loop = true;
         }
 
-        function playSound ( buffer ) {
-            const source = audioContext.createBufferSource();
-            source.buffer = buffer;
-            source.connect( audioContext.destination );
-            source.start( 0 );
-            source.loop = true;
-        }
 
-        loadDogSound( './assets/sound/Go_to_the_camp.mp3' );
+        // AmbientLight
+        const ambientLight = new THREE.AmbientLight( 0xFFFFFF, 0.2 );
+        marker.add( ambientLight );
+
 
         // Directional Light
         const directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
@@ -252,7 +259,7 @@ class Engine {
         directionalLight.position.y = 4;
         directionalLight.shadow.mapSize.width = 2048;
         directionalLight.shadow.mapSize.height = 2048;
-        scene.add( directionalLight );
+        marker.add( directionalLight );
 
 
         // floor
@@ -262,17 +269,16 @@ class Engine {
                 color: 0xFFFFFF,
                 roughness: 0,
                 metalness: 1,
-                envMap: textureCube
+                // envMap: textureCube
             } )
         );
-        floor.position.y = -0.1
+        floor.position.y = -0.05;
         floor.receiveShadow = true;
         marker.add( floor );
 
         tick();
 
         function tick () {
-
 
             requestAnimationFrame( tick );
 
@@ -390,7 +396,7 @@ class FBXModel {
 
                         value.material.envMap = this._textureCube;
                         value.material.shininess = 90;
-                        value.material.reflectivity = 0.9;
+                        value.material.reflectivity = 0.8;
 
                         // shadow
                         value.castShadow = true;
@@ -465,6 +471,145 @@ class GLTFModel {
 
         if ( this._mixier ) this._mixier.update( this._clock.getDelta() );
 
+    }
+
+
+}
+
+
+/***/ }),
+
+/***/ "./src/js/module/SoundHelper.js":
+/*!**************************************!*\
+  !*** ./src/js/module/SoundHelper.js ***!
+  \**************************************/
+/*! exports provided: playerFadeinout */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "playerFadeinout", function() { return playerFadeinout; });
+function playerFadeinout ( bufferNow, context ) {
+    const playNow = createSource( bufferNow, context );
+    const source = playNow.source;
+    const gainNode = playNow.gainNode;
+    const duration = bufferNow.duration;
+    const currTime = context.currentTime;
+
+    let ctx = {
+        FADE_TIME: 10,
+        timer: '',
+    }
+
+    const volumeMax = 0.5;
+
+    // FIXME: noiseが混じる　修正
+    // // Effect
+    // const filter = context.createBiquadFilter();
+    // // create the audio graph
+    // source.connect( filter );
+    // filter.connect( context.destination );
+    // // create and specify params for the filter
+    // filter.type = 'lowpass';
+    // filter.frequency.value = 1000;
+    // filter.gain.value = volumeMax;
+
+    // Fade the playNow track in
+    gainNode.gain.linearRampToValueAtTime( 0, currTime );
+    gainNode.gain.linearRampToValueAtTime( volumeMax, currTime + ctx.FADE_TIME );
+
+    // Play the playNow track.
+    // source.start( 0 );
+    // At the end of the track, fade it out.
+    gainNode.gain.linearRampToValueAtTime( volumeMax, currTime + duration - ctx.FADE_TIME );
+    gainNode.gain.linearRampToValueAtTime( 0, currTime + duration );
+
+    // Schedule a recursive track change with the tracks swapped.
+    setTimeout( () => {
+        playerFadeinout( bufferNow, context );
+    }, duration * 1000 );
+}
+
+
+function createSource ( buffer, context ) {
+    var source = context.createBufferSource();
+    // Create a gain node.
+    var gainNode = context.createGain();
+    source.buffer = buffer;
+    // Turn on looping.
+    source.loop = true;
+    // Connect source to gain.
+    source.connect( gainNode );
+    // Connect gain to destination.
+    gainNode.connect( context.destination );
+
+    return {
+        source: source,
+        gainNode: gainNode
+    };
+}
+
+
+/***/ }),
+
+/***/ "./src/js/module/buffer-loader.js":
+/*!****************************************!*\
+  !*** ./src/js/module/buffer-loader.js ***!
+  \****************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BufferLoader; });
+class BufferLoader {
+
+
+    constructor( context, urlList, callback ) {
+        this.context = context;
+        this.urlList = urlList;
+        this.onload = callback;
+        this.bufferList = new Array();
+        this.loadCount = 0;
+    }
+
+    loadBuffer( url, index ) {
+        // Load buffer asynchronously
+        var request = new XMLHttpRequest();
+        request.open( "GET", url, true );
+        request.responseType = "arraybuffer";
+
+        var loader = this;
+
+        request.onload = function () {
+            // Asynchronously decode the audio file data in request.response
+            loader.context.decodeAudioData(
+                request.response,
+                function ( buffer ) {
+                    if ( !buffer ) {
+                        alert( 'error decoding file data: ' + url );
+                        return;
+                    }
+                    loader.bufferList[ index ] = buffer;
+                    if ( ++loader.loadCount == loader.urlList.length )
+                        loader.onload( loader.bufferList );
+                },
+                function ( error ) {
+                    console.error( 'decodeAudioData error', error );
+                }
+            );
+        }
+
+        request.onerror = function () {
+            alert( 'BufferLoader: XHR error' );
+        }
+
+        request.send();
+    }
+
+    load() {
+        for ( var i = 0; i < this.urlList.length; ++i )
+            this.loadBuffer( this.urlList[ i ], i );
     }
 
 
