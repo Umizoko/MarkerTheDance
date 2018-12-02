@@ -40,7 +40,7 @@ export default class FBXModel {
 
                         value.material.envMap = this._textureCube;
                         value.material.shininess = 90;
-                        value.material.reflectivity = 0.9;
+                        value.material.reflectivity = 0.8;
 
                         // shadow
                         value.castShadow = true;

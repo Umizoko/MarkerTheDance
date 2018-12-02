@@ -1,6 +1,10 @@
 import Stat from './module/stats'
 import FBXModel from './module/FBXModel'
 import GLTFModel from './module/GLTFModel'
+import BufferLoader from './module/buffer-loader'
+import {
+    playerFadeinout
+} from './module/SoundHelper'
 
 export default class Engine {
 
@@ -110,40 +114,43 @@ export default class Engine {
 
         robot.init();
 
-        // Web Audio API
-        // FIXME: 汎用クラスでの書き換え
-        let audioContext;
+
+        // Audioの設定
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioContext();
+        const audioContext = new AudioContext();
 
-        let dogBarkingBuffer = null;
+        // BGM登録
+        const bufferLoader = new BufferLoader(
+            audioContext,
+            [
+                './assets/sound/Go_to_the_camp.mp3'
+            ],
+            finishedLoading
+        );
 
-        function loadDogSound ( url ) {
+        // 音声データのロード
+        bufferLoader.load();
 
-            let request = new XMLHttpRequest();
-            request.open( 'GET', url, true );
-            request.responseType = 'arraybuffer';
+        // ロード後の処理
+        function finishedLoading ( bufferList ) {
+            // 1st sourceの指定
+            // 音声再生
+            // ループ再生 
 
+            const source1 = audioContext.createBufferSource();
+            source1.buffer = bufferList[ 0 ];
 
-            request.onload = () => {
-                audioContext.decodeAudioData( request.response, ( buffer ) => {
-                    dogBarkingBuffer = buffer;
-                    playSound( dogBarkingBuffer );
-                } );
-            }
-
-            request.send();
+            source1.connect( audioContext.destination );
+            playerFadeinout( source1.buffer, audioContext );
+            // source1.start( 0 );
+            source1.loop = true;
         }
 
-        function playSound ( buffer ) {
-            const source = audioContext.createBufferSource();
-            source.buffer = buffer;
-            source.connect( audioContext.destination );
-            source.start( 0 );
-            source.loop = true;
-        }
 
-        loadDogSound( './assets/sound/Go_to_the_camp.mp3' );
+        // AmbientLight
+        const ambientLight = new THREE.AmbientLight( 0xFFFFFF, 0.2 );
+        marker.add( ambientLight );
+
 
         // Directional Light
         const directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
@@ -151,7 +158,7 @@ export default class Engine {
         directionalLight.position.y = 4;
         directionalLight.shadow.mapSize.width = 2048;
         directionalLight.shadow.mapSize.height = 2048;
-        scene.add( directionalLight );
+        marker.add( directionalLight );
 
 
         // floor
@@ -161,17 +168,16 @@ export default class Engine {
                 color: 0xFFFFFF,
                 roughness: 0,
                 metalness: 1,
-                envMap: textureCube
+                // envMap: textureCube
             } )
         );
-        floor.position.y = -0.1
+        floor.position.y = -0.05;
         floor.receiveShadow = true;
         marker.add( floor );
 
         tick();
 
         function tick () {
-
 
             requestAnimationFrame( tick );
 
