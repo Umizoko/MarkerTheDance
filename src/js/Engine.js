@@ -143,7 +143,7 @@ export default class Engine {
             source1.connect( audioContext.destination );
             playerFadeinout( source1.buffer, audioContext );
             // source1.start( 0 );
-            source1.loop = true;
+            // source1.loop = true;
         }
 
 

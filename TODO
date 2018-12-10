@@ -2,7 +2,9 @@
 機能フェードイン、フェードアウト、自動再生
 URL: https://www.html5rocks.com/ja/tutorials/webaudio/intro/
 
-・演出としてParticle実装
+marker認識時のみ音声をフェードインで大きくする。
+それ以外は音声は減少していく
+https://qiita.com/katapad/items/cb81375151a9c60d916a
 
 ・Sound
 https://dova-s.jp/bgm/play9834.html

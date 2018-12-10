@@ -12,15 +12,15 @@ export function playerFadeinout ( bufferNow, context ) {
 
     const volumeMax = 0.5;
 
-    // FIXME: noiseが混じる　修正
-    // // Effect
-    // const filter = context.createBiquadFilter();
-    // // create the audio graph
-    // source.connect( filter );
-    // filter.connect( context.destination );
+    // FIXME: noiseが混じる 修正
+    // Effect
+    const filter = context.createBiquadFilter();
+    // create the audio graph
+    source.connect( filter );
+    filter.connect( context.destination );
     // // create and specify params for the filter
     // filter.type = 'lowpass';
-    // filter.frequency.value = 1000;
+    // filter.frequency.value = 2000;
     // filter.gain.value = volumeMax;
 
     // Fade the playNow track in
@@ -28,15 +28,15 @@ export function playerFadeinout ( bufferNow, context ) {
     gainNode.gain.linearRampToValueAtTime( volumeMax, currTime + ctx.FADE_TIME );
 
     // Play the playNow track.
-    // source.start( 0 );
+    source.start( 0 );
     // At the end of the track, fade it out.
     gainNode.gain.linearRampToValueAtTime( volumeMax, currTime + duration - ctx.FADE_TIME );
     gainNode.gain.linearRampToValueAtTime( 0, currTime + duration );
 
     // Schedule a recursive track change with the tracks swapped.
-    setTimeout( () => {
-        playerFadeinout( bufferNow, context );
-    }, duration * 1000 );
+    // setTimeout( () => {
+    //     playerFadeinout( bufferNow, context );
+    // }, duration * 1000 );
 }
 
 
