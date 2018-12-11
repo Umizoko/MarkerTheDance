@@ -131,6 +131,7 @@ export default class Engine {
         // 音声データのロード
         bufferLoader.load();
 
+
         // ロード後の処理
         function finishedLoading ( bufferList ) {
             // 1st sourceの指定
@@ -141,7 +142,7 @@ export default class Engine {
             source1.buffer = bufferList[ 0 ];
 
             source1.connect( audioContext.destination );
-            playerFadeinout( source1.buffer, audioContext );
+            // playerFadeinout( source1.buffer, audioContext );
             // source1.start( 0 );
             // source1.loop = true;
         }
@@ -188,6 +189,20 @@ export default class Engine {
 
             // ar
             context.update( source.domElement );
+
+            // barcord check
+            if ( context.arController.patternMarkers[ 0 ].inCurrent === true ) {
+
+                console.log( 'marker true' );
+                // fade in
+                // gainNode.gain.value = 0;
+
+            } else {
+
+                // fade out
+                // gainNode.gain.value = 0;
+
+            }
 
             // robot update
             robot.update();

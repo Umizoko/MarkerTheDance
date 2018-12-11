@@ -10,7 +10,7 @@ export function playerFadeinout ( bufferNow, context ) {
         timer: '',
     }
 
-    const volumeMax = 0.5;
+    const volumeMax = 0;
 
     // FIXME: noiseが混じる 修正
     // Effect
@@ -51,6 +51,7 @@ function createSource ( buffer, context ) {
     source.connect( gainNode );
     // Connect gain to destination.
     gainNode.connect( context.destination );
+
 
     return {
         source: source,
