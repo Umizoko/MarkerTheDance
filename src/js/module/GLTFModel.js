@@ -1,5 +1,18 @@
+/**
+ *GLTFモデルの読み込み
+ *
+ * @export
+ * @class GLTFModel
+ */
 export default class GLTFModel {
 
+    /**
+     *Creates an instance of GLTFModel.
+     * @param {String} filename
+     * @param {THREE.Scene} scene
+     * @param {THREE.Group} group
+     * @memberof GLTFModel
+     */
     constructor( filename, scene, group ) {
 
         this._filename = filename;
@@ -10,6 +23,11 @@ export default class GLTFModel {
 
     }
 
+    /**
+     *初期化
+     *
+     * @memberof GLTFModel
+     */
     init() {
 
         // gltf loader
@@ -37,6 +55,11 @@ export default class GLTFModel {
 
     }
 
+    /**
+     *update
+     *
+     * @memberof GLTFModel
+     */
     update() {
 
         if ( this._mixier ) this._mixier.update( this._clock.getDelta() );

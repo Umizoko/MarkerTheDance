@@ -1,6 +1,6 @@
 //  モード値をproductionに設定すると最適化された状態で、
 // 　developmentに設定するとソースマップが有効の状態で出力される
-const MODE = 'development';
+const MODE = 'production';
 
 module.exports = {
 

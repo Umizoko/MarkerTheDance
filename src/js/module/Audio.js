@@ -1,5 +1,17 @@
+/**
+ *Audioを制御するクラス
+ *
+ * @export
+ * @class Audio
+ */
 export default class Audio {
 
+    /**
+     *Creates an instance of Audio.
+     * @param {AudioBuffer} bufferNow 
+     * @param {AudioContext} context
+     * @memberof Audio
+     */
     constructor( bufferNow, context ) {
 
         this.playNow = this.createSource( bufferNow, context );
@@ -14,7 +26,16 @@ export default class Audio {
 
     }
 
+    /**
+     *ソース、エフェクトノード（Gain）を作成
+     *
+     * @param {AudioBuffer} buffer
+     * @param {AudioContext} context
+     * @returns {source, gainNode}
+     * @memberof Audio
+     */
     createSource( buffer, context ) {
+
         var source = context.createBufferSource();
         // Create a gain node.
         var gainNode = context.createGain();
@@ -30,21 +51,31 @@ export default class Audio {
             source: source,
             gainNode: gainNode
         };
+
     }
 
 
+    /**
+     *volumeをフェードインする
+     *
+     * @memberof Audio
+     */
     volumeFadeIn() {
 
         if ( this.gainNode.gain.value <= 1.0 ) this.gainNode.gain.value += 0.01;
 
     }
 
+    /**
+     *volumeをフェードアウトする
+     *
+     * @memberof Audio
+     */
     volumeFadeOut() {
 
-        if ( this.gainNode.gain.value >= 0.0 ) this.gainNode.gain.value -= 0.01;
+        if ( this.gainNode.gain.value > 0.0 ) this.gainNode.gain.value -= 0.01;
+        else if ( this.gainNode.gain.value < 0.0 ) this.gainNode.gain.value += 0.01;
+
     }
 
-    Log() {
-        console.log( this.gainNode.gain );
-    }
 }

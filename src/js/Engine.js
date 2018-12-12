@@ -1,6 +1,6 @@
 import Stat from './module/stats'
 import FBXModel from './module/FBXModel'
-import BufferLoader from './module/buffer-loader'
+import BufferLoader from './module/BufferLoader'
 import Audio from './module/Audio'
 
 export default class Engine {
@@ -15,8 +15,8 @@ export default class Engine {
     init() {
 
         // performance
-        const stats = new Stat();
-        document.body.appendChild( stats.dom );
+        // const stats = new Stat();
+        // document.body.appendChild( stats.dom );
 
 
         // create scene
@@ -102,6 +102,7 @@ export default class Engine {
         ] );
 
 
+        // モデル読み込み
         const robot = new FBXModel(
             './assets/robot/WaveHipHopDance.fbx',
             scene,
@@ -129,18 +130,13 @@ export default class Engine {
         // 音声データのロード
         bufferLoader.load();
 
-
         // ロード後の処理
         function finishedLoading ( bufferList ) {
-            // 1st sourceの指定
-            // 音声再生
-            // ループ再生 
 
             const source1 = audioContext.createBufferSource();
             source1.buffer = bufferList[ 0 ];
 
             source1.connect( audioContext.destination );
-            // playerFadeinout( source1.buffer, audioContext );
             audio = new Audio( source1.buffer, audioContext );
 
         }
@@ -167,7 +163,6 @@ export default class Engine {
                 color: 0xFFFFFF,
                 roughness: 0,
                 metalness: 1,
-                // envMap: textureCube
             } )
         );
         floor.position.y = -0.05;
@@ -180,30 +175,25 @@ export default class Engine {
 
             requestAnimationFrame( tick );
 
+            // リソースが揃わなければreturn 
             if ( source.ready === false ) return;
 
             // obs performance
-            stats.update();
+            // stats.update();
 
             // ar
             context.update( source.domElement );
 
-
-            audio.Log();
-
-            // barcord check
+            // audio controll
+            // マーカーチェック時のみ音声を聞こえるようにする
             if ( context.arController.patternMarkers[ 0 ].inCurrent === true ) {
 
-                console.log( 'marker true' );
                 audio.volumeFadeIn();
-                // fade in
-                // gainNode.gain.value = 0;
 
             } else {
 
-                // fade out
-                // gainNode.gain.value = 0;
                 audio.volumeFadeOut();
+
             }
 
             // robot update
@@ -224,9 +214,13 @@ export default class Engine {
         function onResize () {
 
             source.onResizeElement();
+
             source.copyElementSizeTo( renderer.domElement );
+
             if ( context.arController !== null ) {
+
                 source.copyElementSizeTo( context.arController.canvas );
+
             }
 
         }

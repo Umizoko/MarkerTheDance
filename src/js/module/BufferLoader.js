@@ -1,6 +1,19 @@
+/**
+ *Audioデータを読み込むクラス
+ *
+ * @export
+ * @class BufferLoader
+ */
 export default class BufferLoader {
 
 
+    /**
+     *Creates an instance of BufferLoader.
+     * @param {AudioContext} context
+     * @param {Array} urlList
+     * @param {callback} callback
+     * @memberof BufferLoader
+     */
     constructor( context, urlList, callback ) {
         this.context = context;
         this.urlList = urlList;
@@ -9,6 +22,13 @@ export default class BufferLoader {
         this.loadCount = 0;
     }
 
+    /**
+     *Audioデータの読み込み
+     *
+     * @param {String} url
+     * @param {Number} index
+     * @memberof BufferLoader
+     */
     loadBuffer( url, index ) {
         // Load buffer asynchronously
         var request = new XMLHttpRequest();
@@ -43,6 +63,11 @@ export default class BufferLoader {
         request.send();
     }
 
+    /**
+     *ロード実行
+     *
+     * @memberof BufferLoader
+     */
     load() {
         for ( var i = 0; i < this.urlList.length; ++i )
             this.loadBuffer( this.urlList[ i ], i );

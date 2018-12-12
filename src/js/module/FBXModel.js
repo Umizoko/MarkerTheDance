@@ -1,5 +1,19 @@
+/**
+ *FBXモデルを読み込むクラス
+ *
+ * @export
+ * @class FBXModel
+ */
 export default class FBXModel {
 
+    /**
+     *Creates an instance of FBXModel.
+     * @param {String} filename
+     * @param {THREE.Scene} scene
+     * @param {THREE.Group} group
+     * @param {THREE.CubeTexture} textureCube
+     * @memberof FBXModel
+     */
     constructor( filename, scene, group, textureCube ) {
 
         this._filename = filename;
@@ -7,11 +21,17 @@ export default class FBXModel {
         this._group = group;
         this._mixier;
         this._clock = new THREE.Clock();
-
         this._textureCube = textureCube;
+
+        this._meshName = 'SkinnedMesh';
 
     }
 
+    /**
+     *初期化
+     *
+     * @memberof FBXModel
+     */
     init() {
 
         const loader = new THREE.FBXLoader();
@@ -35,8 +55,8 @@ export default class FBXModel {
                 // Mesh抽出
                 object.children.map( ( value, index ) => {
 
-                    // RobotのMesh
-                    if ( value.type === 'SkinnedMesh' ) {
+                    // Meshの設定
+                    if ( value.type === this._meshName ) {
 
                         value.material.envMap = this._textureCube;
                         value.material.shininess = 90;
@@ -51,8 +71,14 @@ export default class FBXModel {
         );
     }
 
+    /**
+     *update
+     *
+     * @memberof FBXModel
+     */
     update() {
 
+        // Animationの更新
         if ( this._mixier ) this._mixier.update( this._clock.getDelta() );
 
     }
