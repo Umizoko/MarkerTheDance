@@ -1,10 +1,7 @@
 import Stat from './module/stats'
 import FBXModel from './module/FBXModel'
-import GLTFModel from './module/GLTFModel'
 import BufferLoader from './module/buffer-loader'
-import {
-    playerFadeinout
-} from './module/SoundHelper'
+import Audio from './module/Audio'
 
 export default class Engine {
 
@@ -118,6 +115,7 @@ export default class Engine {
         // Audioの設定
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioContext = new AudioContext();
+        let audio;
 
         // BGM登録
         const bufferLoader = new BufferLoader(
@@ -143,8 +141,8 @@ export default class Engine {
 
             source1.connect( audioContext.destination );
             // playerFadeinout( source1.buffer, audioContext );
-            // source1.start( 0 );
-            // source1.loop = true;
+            audio = new Audio( source1.buffer, audioContext );
+
         }
 
 
@@ -190,10 +188,14 @@ export default class Engine {
             // ar
             context.update( source.domElement );
 
+
+            audio.Log();
+
             // barcord check
             if ( context.arController.patternMarkers[ 0 ].inCurrent === true ) {
 
                 console.log( 'marker true' );
+                audio.volumeFadeIn();
                 // fade in
                 // gainNode.gain.value = 0;
 
@@ -201,7 +203,7 @@ export default class Engine {
 
                 // fade out
                 // gainNode.gain.value = 0;
-
+                audio.volumeFadeOut();
             }
 
             // robot update
